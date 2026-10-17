@@ -1,150 +1,104 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
+    static class Item {
+        int id;
+        String name;
+        double price;
 
-    static class Product {
-        private final int id;
-        private String name;
-        private double price;
-
-        public Product(int id, String name, double price) {
+        Item(int id, String name, double price) {
             this.id = id;
             this.name = name;
             this.price = price;
         }
 
-        public int getId() { return id; }
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-        public double getPrice() { return price; }
-        public void setPrice(double price) { this.price = price; }
-
         @Override
         public String toString() {
-            return String.format("[%d] %-20s | $%.2f", id, name, price);
+            return String.format("[ID: %d] %-15s | $%.2f", id, name, price);
         }
     }
 
-    private static final List<Product> database = new ArrayList<>();
+    private static final Map<Integer, Item> database = new LinkedHashMap<>();
     private static int nextId = 1;
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        // Seed default records
-        create("Mechanical Keyboard", 89.99);
-        create("Wireless Mouse", 34.50);
+        // Sample data
+        database.put(nextId, new Item(nextId++, "Keyboard", 49.99));
+        database.put(nextId, new Item(nextId++, "Mouse", 25.00));
 
         while (true) {
-            System.out.println("\n--- PRODUCT INVENTORY (CRUD) ---");
-            System.out.println("1. View All (Read)");
-            System.out.println("2. Add Product (Create)");
-            System.out.println("3. Update Product (Update)");
-            System.out.println("4. Delete Product (Delete)");
+            System.out.println("\n=== SIMPLE CRUD MENU ===");
+            System.out.println("1. View All Items");
+            System.out.println("2. Add Item");
+            System.out.println("3. Update Item");
+            System.out.println("4. Delete Item");
             System.out.println("5. Exit");
-            System.out.print("Choose an option: ");
+            System.out.print("Choose (1-5): ");
 
             String choice = scanner.nextLine().trim();
 
             switch (choice) {
-                case "1" -> readAll();
-                case "2" -> handleCreate();
-                case "3" -> handleUpdate();
-                case "4" -> handleDelete();
+                case "1" -> viewAll();
+                case "2" -> addItem();
+                case "3" -> updateItem();
+                case "4" -> deleteItem();
                 case "5" -> {
-                    System.out.println("Terminating session. Goodbye!");
+                    System.out.println("Exiting. Goodbye!");
                     return;
                 }
-                default -> System.out.println("Invalid selection. Try again.");
+                default -> System.out.println("Invalid option.");
             }
         }
     }
 
-    // CREATE
-    private static void create(String name, double price) {
-        database.add(new Product(nextId++, name, price));
-    }
-
-    private static void handleCreate() {
-        System.out.print("Enter product name: ");
-        String name = scanner.nextLine().trim();
-        System.out.print("Enter product price: ");
-        double price = parseDoubleInput();
-
-        create(name, price);
-        System.out.println("Product added successfully.");
-    }
-
-    // READ
-    private static void readAll() {
+    private static void viewAll() {
         if (database.isEmpty()) {
-            System.out.println("No records found.");
+            System.out.println("No items in database.");
             return;
         }
-        System.out.println("\nCurrent Catalog:");
-        database.forEach(System.out::println);
+        System.out.println("\n--- Items List ---");
+        database.values().forEach(System.out::println);
     }
 
-    // UPDATE
-    private static void handleUpdate() {
-        System.out.print("Enter product ID to update: ");
-        int id = parseIntInput();
+    private static void addItem() {
+        System.out.print("Enter item name: ");
+        String name = scanner.nextLine().trim();
+        System.out.print("Enter price: ");
+        double price = Double.parseDouble(scanner.nextLine().trim());
 
-        Optional<Product> target = findById(id);
-        if (target.isEmpty()) {
-            System.out.println("Product with ID " + id + " not found.");
+        Item item = new Item(nextId, name, price);
+        database.put(nextId++, item);
+        System.out.println("Added: " + item);
+    }
+
+    private static void updateItem() {
+        System.out.print("Enter item ID to update: ");
+        int id = Integer.parseInt(scanner.nextLine().trim());
+        Item item = database.get(id);
+
+        if (item == null) {
+            System.out.println("Item not found!");
             return;
         }
 
-        Product product = target.get();
-        System.out.print("Enter new name (leave blank to keep '" + product.getName() + "'): ");
-        String newName = scanner.nextLine().trim();
-        if (!newName.isEmpty()) {
-            product.setName(newName);
-        }
+        System.out.print("Enter new name: ");
+        item.name = scanner.nextLine().trim();
+        System.out.print("Enter new price: ");
+        item.price = Double.parseDouble(scanner.nextLine().trim());
 
-        System.out.print("Enter new price (or enter -1 to keep $" + product.getPrice() + "): ");
-        double newPrice = parseDoubleInput();
-        if (newPrice >= 0) {
-            product.setPrice(newPrice);
-        }
-
-        System.out.println("Product updated successfully.");
+        System.out.println("Updated: " + item);
     }
 
-    // DELETE
-    private static void handleDelete() {
-        System.out.print("Enter product ID to delete: ");
-        int id = parseIntInput();
+    private static void deleteItem() {
+        System.out.print("Enter item ID to delete: ");
+        int id = Integer.parseInt(scanner.nextLine().trim());
+        Item removed = database.remove(id);
 
-        boolean removed = database.removeIf(p -> p.getId() == id);
-        if (removed) {
-            System.out.println("Product ID " + id + " deleted.");
+        if (removed != null) {
+            System.out.println("Deleted ID " + id);
         } else {
-            System.out.println("Product ID " + id + " not found.");
-        }
-    }
-
-    // HELPERS
-    private static Optional<Product> findById(int id) {
-        return database.stream().filter(p -> p.getId() == id).findFirst();
-    }
-
-    private static int parseIntInput() {
-        try {
-            return Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-    }
-
-    private static double parseDoubleInput() {
-        try {
-            return Double.parseDouble(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            return -1.0;
+            System.out.println("Item not found!");
         }
     }
 }
