@@ -1,3 +1,9 @@
+# IntelliJ IDEA project files
 .idea/
 *.iml
 out/
+
+# Build artifacts and OS cache
+target/
+.DS_Store
+Thumbs.db
