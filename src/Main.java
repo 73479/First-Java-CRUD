@@ -1,12 +1,12 @@
 import java.util.*;
 
 public class Main {
-    static class Item {
+    static class product {
         int id;
         String name;
         double price;
 
-        Item(int id, String name, double price) {
+        product(int id, String name, double price) {
             this.id = id;
             this.name = name;
             this.price = price;
@@ -18,21 +18,21 @@ public class Main {
         }
     }
 
-    private static final Map<Integer, Item> database = new LinkedHashMap<>();
+    private static final Map<Integer, product> database = new LinkedHashMap<>();
     private static int nextId = 1;
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         // Sample data
-        database.put(nextId, new Item(nextId++, "Keyboard", 49.99));
-        database.put(nextId, new Item(nextId++, "Mouse", 25.00));
+        database.put(nextId, new product(nextId++, "Keyboard", 49.99));
+        database.put(nextId, new product(nextId++, "Mouse", 25.00));
 
         while (true) {
             System.out.println("\n=== SIMPLE CRUD MENU ===");
-            System.out.println("1. View All Items");
-            System.out.println("2. Add Item");
-            System.out.println("3. Update Item");
-            System.out.println("4. Delete Item");
+            System.out.println("1. View All products");
+            System.out.println("2. Add product");
+            System.out.println("3. Update product");
+            System.out.println("4. Delete product");
             System.out.println("5. Exit");
             System.out.print("Choose (1-5): ");
 
@@ -40,9 +40,9 @@ public class Main {
 
             switch (choice) {
                 case "1" -> viewAll();
-                case "2" -> addItem();
-                case "3" -> updateItem();
-                case "4" -> deleteItem();
+                case "2" -> addproduct();
+                case "3" -> updateproduct();
+                case "4" -> deleteproduct();
                 case "5" -> {
                     System.out.println("Exiting. Goodbye!");
                     return;
@@ -54,51 +54,51 @@ public class Main {
 
     private static void viewAll() {
         if (database.isEmpty()) {
-            System.out.println("No items in database.");
+            System.out.println("No products in database.");
             return;
         }
-        System.out.println("\n--- Items List ---");
+        System.out.println("\n--- products List ---");
         database.values().forEach(System.out::println);
     }
 
-    private static void addItem() {
-        System.out.print("Enter item name: ");
+    private static void addproduct() {
+        System.out.print("Enter product name: ");
         String name = scanner.nextLine().trim();
         System.out.print("Enter price: ");
         double price = Double.parseDouble(scanner.nextLine().trim());
 
-        Item item = new Item(nextId, name, price);
-        database.put(nextId++, item);
-        System.out.println("Added: " + item);
+        product product = new product(nextId, name, price);
+        database.put(nextId++, product);
+        System.out.println("Added: " + product);
     }
 
-    private static void updateItem() {
-        System.out.print("Enter item ID to update: ");
+    private static void updateproduct() {
+        System.out.print("Enter product ID to update: ");
         int id = Integer.parseInt(scanner.nextLine().trim());
-        Item item = database.get(id);
+        product product = database.get(id);
 
-        if (item == null) {
-            System.out.println("Item not found!");
+        if (product == null) {
+            System.out.println("product not found!");
             return;
         }
 
         System.out.print("Enter new name: ");
-        item.name = scanner.nextLine().trim();
+        product.name = scanner.nextLine().trim();
         System.out.print("Enter new price: ");
-        item.price = Double.parseDouble(scanner.nextLine().trim());
+        product.price = Double.parseDouble(scanner.nextLine().trim());
 
-        System.out.println("Updated: " + item);
+        System.out.println("Updated: " + product);
     }
 
-    private static void deleteItem() {
-        System.out.print("Enter item ID to delete: ");
+    private static void deleteproduct() {
+        System.out.print("Enter product ID to delete: ");
         int id = Integer.parseInt(scanner.nextLine().trim());
-        Item removed = database.remove(id);
+        product removed = database.remove(id);
 
         if (removed != null) {
             System.out.println("Deleted ID " + id);
         } else {
-            System.out.println("Item not found!");
+            System.out.println("product not found!");
         }
     }
 }
